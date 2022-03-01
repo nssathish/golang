@@ -40,6 +40,63 @@ func slicesMain() {
 }
 
 func allAboutStruts() {
+	//sets using structs
+	intSet := map[int]struct{}{}
+	values := []int{1, 2, 3, 3, 4, 5, 6, 6, 7, 8, 9, 1, 1, 1}
+
+	for _, v := range values {
+		intSet[v] = struct{}{}
+	}
+	fmt.Printf("intSet[5]: %v and type of intSet[5]: %T\n", intSet[5], intSet[5])
+
+	val, ok := intSet[5]
+	if ok {
+		fmt.Println(val, " is present in the set")
+	}
+	//or
+	if value, ok := intSet[5]; ok {
+		fmt.Println(value, " is present in the set")
+		fmt.Printf("Type of value: %T\n", value)
+	}
+
+	type person struct {
+		id        int
+		firstName string
+		lastName  string
+	}
+
+	var seethu person
+	seethu.id = 7
+	seethu.firstName = "Suchithra"
+	seethu.lastName = "Dhanaraj"
+
+	fmt.Println("All about Seethu: ", seethu)
+	seethu.lastName = "Sathish"
+	fmt.Println("Modified data about Seeth: ", seethu)
+
+	sathish := person{
+		id:        47,
+		firstName: "Sathish",
+		lastName:  "Seethu",
+	}
+	fmt.Println("All about ", sathish.firstName, ": ", sathish)
+
+	//Anonumous struct
+	madhu := struct {
+		id        int
+		firstName string
+		lastName  string
+		fatherId  int
+		motherId  int
+	}{
+		1,
+		"Madhu",
+		"Seethu",
+		sathish.id,
+		seethu.id,
+	}
+
+	fmt.Println("All about our kid ", madhu.firstName, ": ", madhu)
 }
 
 func allAboutMaps() {
