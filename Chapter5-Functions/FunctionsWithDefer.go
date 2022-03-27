@@ -29,4 +29,5 @@ func FunctionWithDefer() {
 			break
 		}
 	}
+	defer f.Close()
 }
