@@ -29,4 +29,5 @@ func main() {
 	FunctionWithDefer()
 	DefersRolePlayInDBHandle()
 	DefersRolePlayInFileHandle()
+	CallByValueCheck()
 }
