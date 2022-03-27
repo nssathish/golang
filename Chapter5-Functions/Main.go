@@ -26,4 +26,5 @@ func main() {
 	fmt.Println("Function as parameters")
 	FunctionAsParam()
 	FunctionReturnFunction()
+	FunctionWithDefer()
 }
