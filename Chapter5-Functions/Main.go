@@ -30,4 +30,6 @@ func main() {
 	DefersRolePlayInDBHandle()
 	DefersRolePlayInFileHandle()
 	CallByValueCheck()
+	modifyMap()
+	modifySlice()
 }
