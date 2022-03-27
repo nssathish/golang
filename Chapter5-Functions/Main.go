@@ -27,4 +27,6 @@ func main() {
 	FunctionAsParam()
 	FunctionReturnFunction()
 	FunctionWithDefer()
+	DefersRolePlayInDBHandle()
+	DefersRolePlayInFileHandle()
 }
