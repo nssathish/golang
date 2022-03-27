@@ -29,5 +29,8 @@ func FunctionWithDefer() {
 			break
 		}
 	}
+	//defer can be anywhere
+	//but it will get executed
+	//once the entire function is done
 	defer f.Close()
 }
