@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"net/http"
 )
 
 //interface names end with "er"
@@ -310,4 +311,118 @@ func TypeSwitches() {
 	}
 	result, err := walkTree(parseTree)
 	fmt.Println(result, err)
+}
+
+// Understanding Dependency Injection (DI) via a web app
+// "logger"
+func LogOutput(message string) {
+	fmt.Println(message)
+}
+
+// a data store
+type SimpleDataStore struct {
+	userData map[string]string
+}
+
+func (sds SimpleDataStore) UserNameForID(userID string) (string, bool) {
+	name, ok := sds.userData[userID]
+	return name, ok
+}
+
+// a factory function to create an instance of SimpleDataStore
+func NewSimpleDataStore() SimpleDataStore {
+	return SimpleDataStore{
+		userData: map[string]string{
+			"1": "Fred",
+			"2": "Mary",
+			"3": "Pat",
+		},
+	}
+}
+
+// a business logic needs logger to log and data store to handle data
+// but we don't want it to depend on one concrete type.
+// So, interfaces to the rescue
+type DataStore interface {
+	UserNameForID(userID string) (string, bool)
+}
+
+type Logger interface {
+	Log(message string)
+}
+
+// to make our LogOutput function meet this interfaces
+// we are define a function type with a method o it
+type LoggerAdapter func(message string)
+
+func (la LoggerAdapter) Log(message string) {
+	la(message)
+}
+
+type SimpleLogic struct {
+	l  Logger
+	ds DataStore
+}
+
+func (sl SimpleLogic) SayHello(userID string) (string, error) {
+	sl.l.Log("in SayHello for " + userID)
+	if name, ok := sl.ds.UserNameForID(userID); ok {
+		return "Hello, " + name, nil
+	} else {
+		return "", errors.New("unknown user")
+	}
+}
+func (sl SimpleLogic) SayGoodBye(userID string) (string, error) {
+	sl.l.Log("in SayGoodBye for " + userID)
+	if name, ok := sl.ds.UserNameForID(userID); ok {
+		return "Good Bye, " + name, nil
+	} else {
+		return "", errors.New("unknown user")
+	}
+}
+
+func NewSimpleLogic(l Logger, ds DataStore) SimpleLogic {
+	return SimpleLogic{
+		l:  l,
+		ds: ds,
+	}
+}
+
+// web app
+type WebLogic interface {
+	SayHello(userID string) (string, error)
+}
+type Controller struct {
+	l      Logger
+	wLogic WebLogic
+}
+
+func (c Controller) SayHello(w http.ResponseWriter, r *http.Request) {
+	c.l.Log("In SayHello")
+	userID := r.URL.Query().Get("user_id")
+	message, err := c.wLogic.SayHello(userID)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(err.Error()))
+		return
+	}
+	w.Write([]byte(message))
+}
+
+// factory for the controller
+func NewController(l Logger, wl WebLogic) Controller {
+	// interface is accepted and return structs
+	return Controller{
+		l:      l,
+		wLogic: wl,
+	}
+}
+
+func DependencyInjections() {
+	l := LoggerAdapter(LogOutput)
+	ds := NewSimpleDataStore()
+	logic := NewSimpleLogic(l, ds)
+	c := NewController(l, logic)
+	http.HandleFunc("/hello", c.SayHello)
+	http.ListenAndServe(":8080", nil)
 }

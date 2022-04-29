@@ -50,5 +50,5 @@ func main() {
 	TypeAssertions()
 	TypeSwitches()
 	// BridgesToInterfaces()
-	// DependencyInjections()
+	DependencyInjections()
 }
