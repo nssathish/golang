@@ -175,3 +175,26 @@ func (ll *LinkedList) insert(pos int, value interface{}) *LinkedList {
 	ll.Next = ll.Next.insert(pos-1, value)
 	return ll
 }
+
+func TypeAssertions() {
+	type MyInt int
+
+	var i interface{}
+	var mine MyInt = 20
+	i = mine
+
+	i2 := i.(MyInt)
+	fmt.Println(i2 + 1)
+
+	if i3, ok := i.(string); ok { //run time error
+		fmt.Println(i3)
+	} else {
+		fmt.Println(fmt.Errorf("unexpected type for %v", i))
+	}
+
+	if i4, ok := i.(int); ok { //run time error
+		fmt.Println(i4 + 1)
+	} else {
+		fmt.Println(fmt.Errorf("unexpected type for %v", i))
+	}
+}

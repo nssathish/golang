@@ -47,7 +47,7 @@ func main() {
 	EmbeddingAndInterfaces()
 	NilAndInterfaces()
 	EmptyInterfaces()
-	// TypeAssertions()
+	TypeAssertions()
 	// TypeSwitches()
 	// BridgesToInterfaces()
 	// DependencyInjections()
