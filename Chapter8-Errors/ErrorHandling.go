@@ -1,6 +1,9 @@
 package main
 
 import (
+	"archive/zip"
+	"bytes"
+	"consterr"
 	"errors"
 	"fmt"
 )
@@ -44,4 +47,20 @@ func UsingStringsForSimpleErrors() {
 	fmt.Println(QuotientRemainderDivisorByErrorf(3, 2))
 	fmt.Println(QuotientRemainderDivisorByErrorsNewFunc(20, 0))
 	fmt.Println(QuotientRemainderDivisorByErrorsNewFunc(5, 4))
+}
+
+// to signal the processing cannot continue due to a problem
+// of the **** CURRENT STATE **** (basically a state management)
+func SentinelErrors() {
+	data := []byte("This is not a zip file")
+	notAZipFile := bytes.NewReader(data)
+	_, err := zip.NewReader(notAZipFile, int64(len(data)))
+	if err == zip.ErrFormat { // " 'Err'Format is the sentinel error "
+		fmt.Println(fmt.Errorf("zip file erorr"))
+	}
+
+	const (
+		ErrFoo = consterr.Sentinel("foo error")
+		ErrBar = consterr.Sentinel("bar error")
+	)
 }

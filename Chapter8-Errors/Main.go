@@ -3,7 +3,7 @@ package main
 func main() {
 	BasicErrorHandling()
 	UsingStringsForSimpleErrors()
-	// SentinelErrors()
+	SentinelErrors()
 	// ErrorsAreValues()
 	// WrappingErrors()
 	// IsAndAsInErrorHandling()
