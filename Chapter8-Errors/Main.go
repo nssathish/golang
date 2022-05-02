@@ -2,7 +2,7 @@ package main
 
 func main() {
 	BasicErrorHandling()
-	// UsingStringsForSimpleErrors()
+	UsingStringsForSimpleErrors()
 	// SentinelErrors()
 	// ErrorsAreValues()
 	// WrappingErrors()
