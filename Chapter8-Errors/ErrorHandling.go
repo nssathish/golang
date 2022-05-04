@@ -114,6 +114,54 @@ func Login(uid, pwd string) error {
 		return nil
 	}
 }
+
+//custom defined error types
+func GenerateError(flag bool) error {
+	var genErr StatusErr
+	if flag {
+		genErr = StatusErr{
+			Status: NotFound,
+		}
+	}
+	return genErr
+}
+
+// idiomatic custom error types
+func GenerateErrorIdiomaticOne(flag bool) error {
+	if flag {
+		return StatusErr{
+			Status: NotFound,
+		}
+	}
+
+	return nil
+}
+
+func GenerateErrorIdiomaticTwo(flag bool) error {
+	var genErr error // always declare standard error type
+	if flag {
+		genErr = StatusErr{
+			Status: NotFound,
+		}
+	}
+
+	return genErr
+}
+
 func ErrorsAreValues() {
 	fmt.Println(LoginAndGetData("", "", ""))
+	err := GenerateError(true)
+	fmt.Println(err != nil)
+	err = GenerateError(false)
+	fmt.Println(err != nil) // this is not nil because 'error' is an interface. An interface is not nil until both the type and the value of the interface are nil
+
+	// fix and idiomatic approach to write custom error types
+	err = GenerateErrorIdiomaticOne(true)
+	fmt.Println("GenerateErrorIdiomaticOne(true):", err != nil)
+	err = GenerateErrorIdiomaticOne(false)
+	fmt.Println("GenerateErrorIdiomaticOne(false):", err != nil)
+	err = GenerateErrorIdiomaticTwo(true)
+	fmt.Println("GenerateErrorIdiomaticTwo(true):", err != nil)
+	err = GenerateErrorIdiomaticTwo(false)
+	fmt.Println("GenerateErrorIdiomaticTwo(false):", err != nil)
 }
