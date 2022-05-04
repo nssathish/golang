@@ -377,3 +377,27 @@ func WrappingErrorsWithDefer() {
 	fmt.Println(HandleMultipleErrorAfterDefer(1, 0))
 	fmt.Println(HandleMultipleErrorAfterDefer(3, 2))
 }
+
+func doPanic(msg string) {
+	panic(msg)
+}
+func div60(i int) {
+	defer func() {
+		if v := recover(); v != nil { // recover() catches the panic
+			fmt.Println(v)
+		}
+	}()
+	fmt.Println(60 / i)
+}
+func PanicAndRecover() {
+	for _, val := range []int{1, 2, 0, 6} {
+		div60(val)
+	}
+
+	doPanic(os.Args[0])
+}
+
+func GetStackTraceFromError() {
+	err := fileChecker("not_here.txt")
+	fmt.Printf("%+v\n", err)
+}

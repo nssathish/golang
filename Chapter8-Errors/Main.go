@@ -8,6 +8,6 @@ func main() {
 	WrappingErrors()
 	IsAndAsInErrorHandling()
 	WrappingErrorsWithDefer()
-	// PanicAndRecover()
-	// GetStackTraceFromError()
+	GetStackTraceFromError()
+	PanicAndRecover()
 }
