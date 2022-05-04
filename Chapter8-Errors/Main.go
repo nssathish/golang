@@ -5,7 +5,7 @@ func main() {
 	UsingStringsForSimpleErrors()
 	SentinelErrors()
 	ErrorsAreValues()
-	// WrappingErrors()
+	WrappingErrors()
 	// IsAndAsInErrorHandling()
 	// WrappingErrorsWithDefer()
 	// PanicAndRecover()

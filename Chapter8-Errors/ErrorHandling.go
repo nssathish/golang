@@ -6,6 +6,7 @@ import (
 	"consterr"
 	"errors"
 	"fmt"
+	"os"
 )
 
 func CalcRemainderAndMod(numerator, denominator int) (int, int, error) {
@@ -102,7 +103,7 @@ func LoginAndGetData(uid, pwd, file string) ([]byte, error) {
 }
 
 func GetData(file string) ([]byte, error) {
-	if len(file) == 0 {
+	if err := fileChecker(file); err != nil {
 		return nil, errors.New("file not found")
 	}
 	return []byte{255, 255}, nil
@@ -164,4 +165,59 @@ func ErrorsAreValues() {
 	fmt.Println("GenerateErrorIdiomaticTwo(true):", err != nil)
 	err = GenerateErrorIdiomaticTwo(false)
 	fmt.Println("GenerateErrorIdiomaticTwo(false):", err != nil)
+}
+
+func fileChecker(name string) error {
+	f, err := os.Open(name)
+	if err != nil {
+		return fmt.Errorf("in filechecker: %w", err)
+	}
+	f.Close()
+	return nil
+}
+
+//using Unwrap in custom defined error type
+type StatusErrForUnwrap struct {
+	Status  Status
+	message string
+	err     error
+}
+
+func (seu StatusErrForUnwrap) Error() string {
+	return seu.message
+}
+func (seu StatusErrForUnwrap) Unwrap() error {
+	return seu.err
+}
+func LoginAndGetDataForUnwrap(uid, pwd, file string) ([]byte, error) {
+	err := Login(uid, pwd)
+	if err != nil {
+		return nil, StatusErrForUnwrap{
+			Status:  InvalidLogin,
+			message: fmt.Sprintf("invalid credentials for user %s", uid),
+			err:     err,
+		}
+	}
+	data, err := GetData(file)
+	if err != nil {
+		return nil, StatusErrForUnwrap{
+			Status:  NotFound,
+			message: fmt.Sprintf("file %s not found", file),
+			err:     err,
+		}
+	}
+	return data, err
+}
+func WrappingErrors() {
+	err := fileChecker("not_here.txt")
+	if err != nil {
+		fmt.Println(err)
+		if wrappedErr := errors.Unwrap(err); wrappedErr != nil {
+			fmt.Println(wrappedErr)
+		}
+	}
+	data, err := LoginAndGetDataForUnwrap("", "", "not_here.txt")
+	fmt.Println(data, err)
+	data, err = LoginAndGetDataForUnwrap("test", "test", "not_here.txt")
+	fmt.Println(data, err)
 }
