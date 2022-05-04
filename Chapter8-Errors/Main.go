@@ -6,7 +6,7 @@ func main() {
 	SentinelErrors()
 	ErrorsAreValues()
 	WrappingErrors()
-	// IsAndAsInErrorHandling()
+	IsAndAsInErrorHandling()
 	// WrappingErrorsWithDefer()
 	// PanicAndRecover()
 	// GetStackTraceFromError()

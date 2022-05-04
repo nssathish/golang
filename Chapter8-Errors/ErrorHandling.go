@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"reflect"
 )
 
 func CalcRemainderAndMod(numerator, denominator int) (int, int, error) {
@@ -220,4 +221,106 @@ func WrappingErrors() {
 	fmt.Println(data, err)
 	data, err = LoginAndGetDataForUnwrap("test", "test", "not_here.txt")
 	fmt.Println(data, err)
+}
+
+/*
+	errors.Is - when we are looking for a specific instance or value
+	errors.As - when we are looking for a specific type
+*/
+func fileCheckerWithIsToUnwrap(file string) error {
+	f, err := os.Open(file)
+	if errors.Is(err, os.ErrNotExist) {
+		fmt.Println(fmt.Errorf("in fileCheckerWithIsToUnwrap: %w", err))
+		return err
+	}
+	f.Close()
+	return nil
+}
+
+type MyErr struct {
+	Codes []int
+}
+
+func (me MyErr) Error() string {
+	return fmt.Sprintf("codes: %v", me.Codes)
+}
+func (me MyErr) Is(target error) bool {
+	if me2, ok := target.(MyErr); ok {
+		return reflect.DeepEqual(me, me2)
+	}
+	return false
+}
+func GenerateErrorCustom() error {
+	return MyErr{
+		Codes: []int{404},
+	}
+}
+
+type ResourceErr struct {
+	Resource string
+	Codes    []int
+}
+
+func (re ResourceErr) Error() string {
+	return fmt.Sprintf("codes: %v and Resource: %s", re.Codes, re.Resource)
+}
+func (re ResourceErr) Is(target error) bool {
+	if other, ok := target.(ResourceErr); ok {
+		ignoreResource := other.Resource == ""
+		ignoreCode := len(other.Codes) == 0
+		matchResource := re.Resource == other.Resource
+		matchCodes := reflect.DeepEqual(re.Codes, other.Codes)
+
+		return (matchResource && matchCodes) ||
+			(matchResource && ignoreCode) ||
+			(matchCodes && ignoreResource)
+	}
+	return false
+}
+func (re ResourceErr) DigitalResource() string {
+	return re.Resource
+}
+func (re ResourceErr) ErrorCodes() []int {
+	return re.Codes
+}
+
+func GenerateResourceError() error {
+	return ResourceErr{
+		Resource: "Database",
+		Codes:    []int{401},
+	}
+}
+
+func IsAndAsInErrorHandling() {
+	// errros.Is
+	err := fileCheckerWithIsToUnwrap("not_here.txt")
+	fmt.Println(err)
+	err = GenerateErrorCustom()
+	ErrNotFound := MyErr{
+		Codes: []int{404},
+	}
+	if errors.Is(err, ErrNotFound) {
+		fmt.Println(err)
+	}
+
+	err = GenerateResourceError()
+	unauthorizedDBAccess := ResourceErr{Resource: "Database", Codes: []int{401}}
+	if errors.Is(err, unauthorizedDBAccess) {
+		fmt.Println(fmt.Sprintf("Resource: '%s' is unauthorized to access (%v)", unauthorizedDBAccess.Resource, unauthorizedDBAccess.Codes))
+	}
+
+	// errors.As
+	var dBAccess401 ResourceErr
+	if errors.As(err, &dBAccess401) {
+		fmt.Println(dBAccess401.Resource, dBAccess401.Codes)
+	}
+
+	var dbAccessor interface {
+		DigitalResource() string
+		ErrorCodes() []int
+	}
+	if errors.As(err, &dbAccessor) {
+		fmt.Println(dbAccessor.DigitalResource())
+		fmt.Println(dbAccessor.ErrorCodes())
+	}
 }
