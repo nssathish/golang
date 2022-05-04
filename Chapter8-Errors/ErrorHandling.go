@@ -63,4 +63,57 @@ func SentinelErrors() {
 		ErrFoo = consterr.Sentinel("foo error")
 		ErrBar = consterr.Sentinel("bar error")
 	)
+	fmt.Println("consterr 1:", ErrFoo)
+	fmt.Println("consterr 2:", ErrBar)
+}
+
+type Status int
+
+const (
+	InvalidLogin Status = iota + 1
+	NotFound
+)
+
+type StatusErr struct {
+	Status  Status
+	message string
+}
+
+func (se StatusErr) Error() string {
+	return se.message
+}
+
+func LoginAndGetData(uid, pwd, file string) ([]byte, error) {
+	err := Login(uid, pwd)
+	if err != nil {
+		return nil, StatusErr{
+			Status:  InvalidLogin,
+			message: fmt.Sprintf("invalid credentials for user %s", uid),
+		}
+	}
+	data, err := GetData(file)
+	if err != nil {
+		return nil, StatusErr{
+			Status:  NotFound,
+			message: fmt.Sprintf("%s file not found", file),
+		}
+	}
+	return data, nil
+}
+
+func GetData(file string) ([]byte, error) {
+	if len(file) == 0 {
+		return nil, errors.New("file not found")
+	}
+	return []byte{255, 255}, nil
+}
+func Login(uid, pwd string) error {
+	if len(uid) == 0 {
+		return errors.New("login failed")
+	} else {
+		return nil
+	}
+}
+func ErrorsAreValues() {
+	fmt.Println(LoginAndGetData("", "", ""))
 }

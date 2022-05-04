@@ -4,7 +4,7 @@ func main() {
 	BasicErrorHandling()
 	UsingStringsForSimpleErrors()
 	SentinelErrors()
-	// ErrorsAreValues()
+	ErrorsAreValues()
 	// WrappingErrors()
 	// IsAndAsInErrorHandling()
 	// WrappingErrorsWithDefer()
