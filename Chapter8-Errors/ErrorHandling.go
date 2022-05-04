@@ -324,3 +324,56 @@ func IsAndAsInErrorHandling() {
 		fmt.Println(dbAccessor.ErrorCodes())
 	}
 }
+
+// Multiple errors within a same function
+// before wrapping with defer
+func HandleMultipleErrorBeforeDefer(val1, val2 int) (string, error) {
+	if val1 < val2 {
+		return "", fmt.Errorf("in HandleMultipleErrorBeforeDefer: %w", errors.New("val1 less than val2"))
+	}
+	if val1 == val2 {
+		return "", fmt.Errorf("in HandleMultipleErrorBeforeDefer: %w", errors.New("val1 equals val2"))
+	}
+	if val2 == 0 {
+		return "", fmt.Errorf("in HandleMultipleErrorBeforeDefer: %w", errors.New("val2 is 0"))
+	}
+	result := val1 / val2
+	return fmt.Sprint(result), nil
+}
+
+// after wrapping with defer
+func HandleMultipleErrorAfterDefer(val1, val2 int) (outcome string, err error) {
+	defer func() {
+		if err != nil {
+			err = fmt.Errorf("in HandleMultipleErrorAfterDefer: %w", err)
+		}
+		if outcome == "failed validation" {
+			outcome = "deferred failed validation"
+		}
+	}() // this extra parenthesis is to call this anonymous function
+
+	if val1 < val2 {
+		return "failed validation", errors.New("val1 less than val2")
+	}
+	if val1 == val2 {
+		return "failed validation", errors.New("val1 equals val2")
+	}
+	if val2 == 0 {
+		return "failed validation", errors.New("val2 is 0")
+	}
+	result := val1 / val2
+
+	return fmt.Sprint(result), nil
+}
+
+func WrappingErrorsWithDefer() {
+	fmt.Println(HandleMultipleErrorBeforeDefer(1, 2))
+	fmt.Println(HandleMultipleErrorBeforeDefer(2, 2))
+	fmt.Println(HandleMultipleErrorBeforeDefer(1, 0))
+	fmt.Println(HandleMultipleErrorBeforeDefer(3, 2))
+
+	fmt.Println(HandleMultipleErrorAfterDefer(1, 2))
+	fmt.Println(HandleMultipleErrorAfterDefer(2, 2))
+	fmt.Println(HandleMultipleErrorAfterDefer(1, 0))
+	fmt.Println(HandleMultipleErrorAfterDefer(3, 2))
+}

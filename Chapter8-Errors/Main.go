@@ -7,7 +7,7 @@ func main() {
 	ErrorsAreValues()
 	WrappingErrors()
 	IsAndAsInErrorHandling()
-	// WrappingErrorsWithDefer()
+	WrappingErrorsWithDefer()
 	// PanicAndRecover()
 	// GetStackTraceFromError()
 }
